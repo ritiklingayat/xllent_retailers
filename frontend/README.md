@@ -46,6 +46,9 @@ This project is ready for GitHub and Vercel deployment.
 - Publish directory: `dist`
 - Optional API variable: `VITE_API_URL=https://your-api-domain.com/api`
 
+If deploying from the repository root, use the included root `vercel.json`; it
+installs and builds the app from the `frontend/` folder automatically.
+
 Copy `.env.example` to `.env` only if you connect a backend API locally.
 
 ### Push to GitHub
