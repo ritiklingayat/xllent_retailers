@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://xllent-retailers.vercel.app/sitemap.xml
