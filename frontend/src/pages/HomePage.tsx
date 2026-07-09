@@ -10,8 +10,9 @@ type PageProps = {
 
 export function HomePage({ navigate }: PageProps) {
   return (
-    <div className="space-y-12 bg-gradient-to-r from-blue-50 to-blue-100 pb-14">
-      <Seo
+<div className="space-y-12 bg-gradient-to-br from-blue-50 via-white to-cyan-100">
+  
+        <Seo
         description="Shop Xllent Retailers FMCG products with categories, featured products, cart, checkout, and order dashboard."
         path="/home"
         title="Premium FMCG Retail"

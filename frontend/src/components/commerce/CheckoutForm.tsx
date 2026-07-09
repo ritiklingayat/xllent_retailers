@@ -28,8 +28,10 @@ const initialAddressDetails = {
   line1: "",
   line2: "",
   city: "",
+  state: "",
   pinCode: ""
 };
+
 
 export function CheckoutForm({ disabled, onSubmit }: CheckoutFormProps) {
   const [details, setDetails] = useState(initialDetails);
@@ -182,6 +184,20 @@ export function CheckoutForm({ disabled, onSubmit }: CheckoutFormProps) {
                   value={addressDetails.city}
                 />
               </label>
+              <label className="grid gap-2 text-sm font-semibold text-surface-black">
+  State
+  <Input
+    onChange={(event) =>
+      setAddressDetails((value) => ({
+        ...value,
+        state: event.target.value
+      }))
+    }
+    placeholder="Enter State"
+    required
+    value={addressDetails.state}
+  />
+</label>
             </div>
             {cityStatus === "error" ? (
               <p className="text-xs font-medium text-red-600">

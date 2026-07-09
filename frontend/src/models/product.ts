@@ -5,6 +5,10 @@ export type Product = {
   category: string;
   brand: string;
   price: number;
+  adminPrice?: number;
+  superStockiestPrice?: number;
+  distributorsPrice?: number;
+  wholesalerPrice?: number;
   stock: number;
   shortDescription: string;
   description: string;

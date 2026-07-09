@@ -13,43 +13,31 @@ type LoginPageProps = {
 export function LoginPage({ navigate }: LoginPageProps) {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [identifier, setIdentifier] = useState("");
-  const [otp, setOtp] = useState("");
-  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  const generateOtp = () => {
-    const demoOtp = String(Math.floor(100000 + Math.random() * 900000));
-    setGeneratedOtp(demoOtp);
-    setOtp("");
-    setMessage(`Demo OTP: ${demoOtp}`);
-  };
+  const loginWithPassword = () => {
+    const account = loadAccounts().find(
+      (item) =>
+        (item.email === identifier || item.phone === identifier) &&
+        item.password === password
+    );
 
-  const verifyOtp = () => {
-    if (!generatedOtp || otp !== generatedOtp) {
-      setMessage("Enter the generated demo OTP to continue.");
+    if (!account) {
+      setMessage("Invalid mobile/email or password.");
       return;
     }
 
-    const account = loadAccounts().find(
-      (item) => item.email === identifier || item.phone === identifier
-    );
-    saveCurrentCustomer(
-      account ?? {
-        name: "Xllent Retailers Customer",
-        email: identifier.includes("@") ? identifier : "",
-        phone: identifier.includes("@") ? "" : identifier,
-        address: ""
-      }
-    );
+    saveCurrentCustomer(account);
     navigate("/dashboard");
   };
 
   return (
     <main className="min-h-screen bg-[#f8fbf1]">
       <Seo
-        description="Login to Xllent Retailers with customer registration and demo OTP access."
+        description="Login to Xllent Retailers with customer registration and password access."
         path="/"
-        title="Customer Login"
+        title="Wholesaler Login"
       />
       <section className="grid min-h-screen lg:grid-cols-[0.95fr_1.05fr]">
         <div className="relative hidden overflow-hidden bg-surface-black lg:block">
@@ -65,7 +53,7 @@ export function LoginPage({ navigate }: LoginPageProps) {
             </p>
             <h1 className="mt-3 text-surface-white">Customer ordering made simple</h1>
             <p className="mt-4 text-lg leading-8 text-white/82">
-              Register, login with a demo OTP, shop FMCG essentials, and track
+              Register, login with your password, shop FMCG essentials, and track
               every order from your customer dashboard.
             </p>
           </div>
@@ -99,7 +87,7 @@ export function LoginPage({ navigate }: LoginPageProps) {
                   size="sm"
                   variant={mode === "login" ? "primary" : "outline"}
                 >
-                  Customer Login
+                  Wholesaler Login
                 </Button>
                 <Button
                   onClick={() => {
@@ -118,13 +106,13 @@ export function LoginPage({ navigate }: LoginPageProps) {
                   className="grid gap-4"
                   onSubmit={(event) => {
                     event.preventDefault();
-                    verifyOtp();
+                    loginWithPassword();
                   }}
                 >
                   <div>
-                    <h2 className="text-2xl">OTP Login</h2>
+                    <h2 className="text-2xl">Wholesaler Login</h2>
                     <p className="mt-2 text-sm leading-6">
-                      Enter your mobile number or email, generate a demo OTP, then verify.
+                      Enter your registered mobile number or email and password.
                     </p>
                   </div>
                   <Input
@@ -133,19 +121,15 @@ export function LoginPage({ navigate }: LoginPageProps) {
                     placeholder="Mobile number or email"
                     value={identifier}
                   />
-                  <div className="grid gap-3 md:grid-cols-[1fr_auto]">
-                    <Input
-                      inputMode="numeric"
-                      onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
-                      placeholder="Enter demo OTP"
-                      value={otp}
-                    />
-                    <Button onClick={generateOtp} type="button" variant="outline">
-                      Generate OTP
-                    </Button>
-                  </div>
+                  <Input
+                    required
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="Password"
+                    type="password"
+                    value={password}
+                  />
                   <Button className="w-full gap-2" type="submit">
-                    Verify OTP
+                    Login
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </form>
@@ -158,9 +142,9 @@ export function LoginPage({ navigate }: LoginPageProps) {
                       name: String(form.get("name") ?? ""),
                       phone: String(form.get("phone") ?? ""),
                       email: String(form.get("email") ?? ""),
-                      password: "otp-demo"
+                      password: String(form.get("password") ?? "")
                     });
-                    setMessage("Account created. You can now login with demo OTP.");
+                    setMessage("Account created. You can now login with your password.");
                     event.currentTarget.reset();
                     setMode("login");
                   }}
@@ -173,6 +157,7 @@ export function LoginPage({ navigate }: LoginPageProps) {
                     <Input required name="name" placeholder="Full name" />
                     <Input required name="phone" placeholder="Phone number" type="tel" />
                     <Input required name="email" placeholder="Email ID" type="email" />
+                    <Input required name="password" placeholder="Password" type="password" />
                   </div>
                   <Button className="mt-5 w-full gap-2" type="submit">
                     <UserPlus className="h-4 w-4" />

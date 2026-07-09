@@ -57,7 +57,7 @@ export function HeroSection({ navigate }: HeroSectionProps) {
         <div className="grid gap-3 sm:grid-cols-3">
           {metrics.map((metric) => (
             <div
-              className="rounded-component border border-surface-border bg-surface-white/75 p-4 shadow-soft"
+              className="rounded-component border border-surface-border bg-surface-red/75 p-4 shadow-soft"
               key={metric.label}
             >
               <div className="text-2xl font-bold text-surface-black">{metric.value}</div>
@@ -67,8 +67,8 @@ export function HeroSection({ navigate }: HeroSectionProps) {
         </div>
       </div>
 
-      <div className="relative min-h-[420px] overflow-hidden rounded-component bg-surface-black">
-        <img
+<div className="relative min-h-[420px] overflow-hidden rounded-component bg-gradient-to-br from-blue-100 via-white to-cyan-100">
+          <img
           alt="Organized FMCG products on retail shelves"
           className="absolute inset-0 h-full w-full object-cover opacity-88"
           src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=1200&q=85"

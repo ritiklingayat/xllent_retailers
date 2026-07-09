@@ -17,6 +17,7 @@ export function ProductDetailsPage({ navigate, slug }: ProductDetailsPageProps) 
   const dispatch = useAppDispatch();
   const product = loadManagedProducts().find((item) => item.slug === slug);
 
+
   if (!product) {
     return (
       <div className="pb-12">
@@ -62,6 +63,7 @@ export function ProductDetailsPage({ navigate, slug }: ProductDetailsPageProps) 
           loading="lazy"
           src={product.imageUrl}
         />
+        
       </div>
       <div className="space-y-6">
         <div>

@@ -13,6 +13,7 @@ export function ProductsPage({ navigate }: PageProps) {
         path="/products"
         title="Products"
       />
+      
       <div>
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-gold-dark">
           Catalog

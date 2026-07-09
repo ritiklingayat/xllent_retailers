@@ -24,3 +24,7 @@ run(process.execPath, ["./node_modules/vite/bin/vite.js", "build"]);
 const adminEntry = "dist/admin/index.html";
 mkdirSync(dirname(adminEntry), { recursive: true });
 copyFileSync("dist/index.html", adminEntry);
+
+const superAdminEntry = "dist/super-admin/index.html";
+mkdirSync(dirname(superAdminEntry), { recursive: true });
+copyFileSync("dist/index.html", superAdminEntry);

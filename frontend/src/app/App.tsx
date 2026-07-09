@@ -3,8 +3,8 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { LoginPage } from "@/pages/LoginPage";
 import { purgeLegacyRetailData } from "@/services/localStore";
 
-const AdminPage = lazy(() =>
-  import("@/pages/AdminPage").then((module) => ({ default: module.AdminPage }))
+const SuperAdminPage = lazy(() =>
+  import("@/pages/SuperAdminPage").then((module) => ({ default: module.SuperAdminPage }))
 );
 
 const BlogPage = lazy(() =>
@@ -51,7 +51,8 @@ export type Route =
   | "dashboard"
   | "distributor"
   | "blog"
-  | "admin";
+  | "admin"
+  | "super-admin";
 
 function getInitialPath() {
   const hashPath = window.location.hash.replace("#", "");
@@ -85,8 +86,16 @@ export function App() {
 
     if (path === "/admin") {
       return (
-        <Suspense fallback={<div className="p-8">Loading admin...</div>}>
-          <AdminPage navigate={navigate} />
+        <Suspense fallback={<div className="p-8">Loading super admin...</div>}>
+          <SuperAdminPage navigate={navigate} />
+        </Suspense>
+      );
+    }
+
+    if (path === "/super-admin") {
+      return (
+        <Suspense fallback={<div className="p-8">Loading super admin...</div>}>
+          <SuperAdminPage navigate={navigate} />
         </Suspense>
       );
     }
@@ -131,7 +140,7 @@ export function App() {
     return <NotFoundPage navigate={navigate} />;
   }, [path]);
 
-  if (path === "/" || path === "/admin") {
+  if (path === "/" || path === "/admin" || path === "/super-admin") {
     return page;
   }
 
