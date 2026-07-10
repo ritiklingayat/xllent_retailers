@@ -4,12 +4,20 @@ import { products as defaultProducts } from "@/models/products";
 
 export type Account = {
   id: string;
+  userId: string;
   name: string;
+  brand: string;
+  status: UserStatus;
   phone: string;
   email: string;
   password: string;
+  role: UserRole;
   createdAt: string;
+  updatedAt?: string;
 };
+
+export type UserRole = "Admin" | "Super Stockist" | "Distributor" | "Wholesaler" | "Customer";
+export type UserStatus = "Active" | "Inactive";
 
 const accountsKey = "xllent-retailers-accounts";
 const productsKey = "xllent-retailers-products";
@@ -32,20 +40,57 @@ function writeJson<T>(key: string, value: T) {
 }
 
 export function loadAccounts() {
-  return readJson<Account[]>(accountsKey, []);
+  return readJson<Partial<Account>[]>(accountsKey, []).map((account) => ({
+    id: account.id ?? `AC-${Date.now()}`,
+    userId: account.userId ?? account.email ?? account.phone ?? "",
+    name: account.name ?? "",
+    brand: account.brand ?? "",
+    status: account.status ?? "Active",
+    phone: account.phone ?? "",
+    email: account.email ?? "",
+    password: account.password ?? "",
+    role: account.role ?? "Customer",
+    createdAt: account.createdAt ?? new Date().toISOString(),
+    updatedAt: account.updatedAt
+  }));
 }
 
 export function saveAccount(account: Omit<Account, "id" | "createdAt">) {
   const accounts = loadAccounts();
+  const userId = account.userId.trim();
+  const existingIndex = accounts.findIndex((item) => item.userId === userId);
   const nextAccount: Account = {
     ...account,
-    id: `AC-${Date.now()}`,
+    userId,
+    id: existingIndex >= 0 ? accounts[existingIndex].id : `AC-${Date.now()}`,
     createdAt: new Date().toISOString()
   };
 
-  writeJson(accountsKey, [nextAccount, ...accounts]);
-  saveCurrentCustomer(nextAccount);
+  const nextAccounts =
+    existingIndex >= 0
+      ? accounts.map((item, index) =>
+          index === existingIndex
+            ? { ...nextAccount, createdAt: item.createdAt, updatedAt: new Date().toISOString() }
+            : item
+        )
+      : [nextAccount, ...accounts];
+
+  writeJson(accountsKey, nextAccounts);
   return nextAccount;
+}
+
+export function deleteAccount(accountId: string) {
+  writeJson(
+    accountsKey,
+    loadAccounts().filter((account) => account.id !== accountId)
+  );
+}
+
+export function findAccountByCredentials(userId: string, password: string) {
+  const normalizedUserId = userId.trim();
+  return loadAccounts().find(
+    (account) => account.userId === normalizedUserId && account.password === password
+  );
 }
 
 export function loadManagedProducts() {

@@ -1,6 +1,6 @@
 import type { LayoutDashboard } from "lucide-react";
 
-export type SuperAdminPageKey = "Dashboard" | "Products" | "Orders" | "Customers";
+export type SuperAdminPageKey = "Dashboard" | "Users" | "Products" | "Orders";
 
 export type SuperAdminModule = {
   label: SuperAdminPageKey;
@@ -10,7 +10,7 @@ export type SuperAdminModule = {
 export type ProductForm = {
   name: string;
   category: string;
-  brand: string;
+  mrp: string;
   adminPrice: string;
   superStockiestPrice: string;
   distributorsPrice: string;
@@ -21,8 +21,8 @@ export type ProductForm = {
 
 export const emptyProductForm: ProductForm = {
   name: "",
-  category: "",
-  brand: "",
+  category: "Chocolate",
+  mrp: "",
   adminPrice: "",
   superStockiestPrice: "",
   distributorsPrice: "",
@@ -30,3 +30,12 @@ export const emptyProductForm: ProductForm = {
   imageUrl: "",
   description: ""
 };
+
+export const productCategories = [
+  "Chocolate",
+  "Candy",
+  "Lollipop",
+  "Chikki",
+  "Spices",
+  "Snacks"
+];

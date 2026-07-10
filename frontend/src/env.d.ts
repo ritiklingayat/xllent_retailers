@@ -7,3 +7,6 @@ interface ImportMeta {
 }
 
 declare module "*.css";
+declare module "*.webp";
+declare module "*.jfif";
+declare module "*.png";

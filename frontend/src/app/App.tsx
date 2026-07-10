@@ -3,6 +3,9 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { LoginPage } from "@/pages/LoginPage";
 import { purgeLegacyRetailData } from "@/services/localStore";
 
+const LandingPage = lazy(() =>
+  import("@/pages/LandingPage").then((module) => ({ default: module.LandingPage }))
+);
 const SuperAdminPage = lazy(() =>
   import("@/pages/SuperAdminPage").then((module) => ({ default: module.SuperAdminPage }))
 );
@@ -81,6 +84,14 @@ export function App() {
 
   const page = useMemo(() => {
     if (path === "/") {
+      return (
+        <Suspense fallback={<div className="p-8">Loading...</div>}>
+          <LandingPage navigate={navigate} />
+        </Suspense>
+      );
+    }
+
+    if (path === "/login") {
       return <LoginPage navigate={navigate} />;
     }
 
@@ -140,7 +151,7 @@ export function App() {
     return <NotFoundPage navigate={navigate} />;
   }, [path]);
 
-  if (path === "/" || path === "/admin" || path === "/super-admin") {
+  if (path === "/" || path === "/login" || path === "/products" || path === "/admin" || path === "/super-admin") {
     return page;
   }
 

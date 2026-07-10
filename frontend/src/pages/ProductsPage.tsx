@@ -9,7 +9,7 @@ export function ProductsPage({ navigate }: PageProps) {
   return (
     <div className="space-y-8 pb-12">
       <Seo
-        description="Browse Xllent Retailers FMCG products by name, category, and brand with cart actions."
+        description="Browse Xllent Retailers FMCG products by name, category, and brand."
         path="/products"
         title="Products"
       />
@@ -20,7 +20,7 @@ export function ProductsPage({ navigate }: PageProps) {
         </p>
         <h1 className="mt-2">Xllent Retailers Products</h1>
       </div>
-      <ProductCatalog navigate={navigate} />
+      <ProductCatalog navigate={navigate} viewOnly />
     </div>
   );
 }

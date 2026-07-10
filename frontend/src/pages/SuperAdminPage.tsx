@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   LogOut,
   PackageCheck,
-  Users
+  UserCheck
 } from "lucide-react";
 import { Seo } from "@/components/seo/Seo";
 import { Button } from "@/components/ui/Button";
@@ -22,11 +22,11 @@ import {
   type Account
 } from "@/services/localStore";
 import { cn } from "@/utils/cn";
-import { SuperAdminCustomersPage } from "./super-admin/SuperAdminCustomersPage";
 import { SuperAdminDashboardPage } from "./super-admin/SuperAdminDashboardPage";
 import { SuperAdminLoginPage } from "./super-admin/SuperAdminLoginPage";
 import { SuperAdminOrdersPage } from "./super-admin/SuperAdminOrdersPage";
 import { SuperAdminProductsPage } from "./super-admin/SuperAdminProductsPage";
+import { SuperAdminUsersPage } from "./super-admin/SuperAdminUsersPage";
 import {
   emptyProductForm,
   type ProductForm,
@@ -40,9 +40,9 @@ type SuperAdminPageProps = {
 
 const superAdminModules: SuperAdminModule[] = [
   { label: "Dashboard", icon: LayoutDashboard },
+  { label: "Users", icon: UserCheck },
   { label: "Products", icon: Boxes },
-  { label: "Orders", icon: PackageCheck },
-  { label: "Customers", icon: Users }
+  { label: "Orders", icon: PackageCheck }
 ];
 
 const superAdminCredentials = {
@@ -117,7 +117,8 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
       name: form.name,
       slug,
       category: form.category,
-      brand: form.brand,
+      brand: "Xllent",
+      mrp: Number(form.mrp || 0),
       price: wholesalerPrice,
       adminPrice: Number(form.adminPrice || 0),
       superStockiestPrice: Number(form.superStockiestPrice || 0),
@@ -130,7 +131,7 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
         form.imageUrl ||
         "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=80",
       colorClass: "from-gold-secondary/20 to-harvest-cream",
-      highlights: [form.category, form.brand, "Retail ready"].filter(Boolean),
+      highlights: [form.category, "Xllent", "Retail ready"].filter(Boolean),
       bestFor: ["Customer orders", "Retail shelves", "Wholesale supply"]
     };
 
@@ -147,7 +148,7 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
     setForm({
       name: product.name,
       category: product.category,
-      brand: product.brand,
+      mrp: String(product.mrp ?? product.price),
       adminPrice: String(product.adminPrice ?? product.price),
       superStockiestPrice: String(product.superStockiestPrice ?? product.price),
       distributorsPrice: String(product.distributorsPrice ?? product.price),
@@ -229,11 +230,13 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
 
           {activePage === "Dashboard" ? (
             <SuperAdminDashboardPage
-              customerCount={accounts.length}
               orders={orders}
               productCount={products.length}
+              userCount={accounts.length}
             />
           ) : null}
+
+          {activePage === "Users" ? <SuperAdminUsersPage accounts={accounts} /> : null}
 
           {activePage === "Products" ? (
             <SuperAdminProductsPage
@@ -259,7 +262,6 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
             />
           ) : null}
 
-          {activePage === "Customers" ? <SuperAdminCustomersPage accounts={accounts} /> : null}
         </section>
       </div>
     </main>

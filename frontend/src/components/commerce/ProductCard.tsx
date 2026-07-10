@@ -12,9 +12,10 @@ type ProductCardProps = {
   compact?: boolean;
   navigate: (path: string) => void;
   product: Product;
+  viewOnly?: boolean;
 };
 
-export function ProductCard({ compact = false, navigate, product }: ProductCardProps) {
+export function ProductCard({ compact = false, navigate, product, viewOnly = false }: ProductCardProps) {
   const dispatch = useAppDispatch();
 
   return (
@@ -71,27 +72,33 @@ export function ProductCard({ compact = false, navigate, product }: ProductCardP
           ))}
         </div>
 
-        <div className={cn("grid gap-3", compact ? "grid-cols-2 gap-2" : "sm:grid-cols-2")}>
-          <Button
-            className="gap-2 px-2"
-            onClick={() => dispatch(addToCart({ productId: product.id }))}
-            size={compact ? "sm" : "md"}
-            title="Add to cart"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span className={cn(compact && "sr-only sm:not-sr-only")}>Add</span>
-          </Button>
-          <Button
-            className="gap-2 px-2"
-            onClick={() => navigate(`/products/${product.slug}`)}
-            size={compact ? "sm" : "md"}
-            title="View product details"
-            variant="outline"
-          >
-            <Eye className="h-4 w-4" />
-            <span className={cn(compact && "sr-only sm:not-sr-only")}>Details</span>
-          </Button>
-        </div>
+        {viewOnly ? (
+          <div className="rounded-component border border-surface-border bg-[#fbfcf7] px-3 py-2 text-sm font-semibold text-surface-muted">
+            Product preview only
+          </div>
+        ) : (
+          <div className={cn("grid gap-3", compact ? "grid-cols-2 gap-2" : "sm:grid-cols-2")}>
+            <Button
+              className="gap-2 px-2"
+              onClick={() => dispatch(addToCart({ productId: product.id }))}
+              size={compact ? "sm" : "md"}
+              title="Add to cart"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span className={cn(compact && "sr-only sm:not-sr-only")}>Add</span>
+            </Button>
+            <Button
+              className="gap-2 px-2"
+              onClick={() => navigate(`/products/${product.slug}`)}
+              size={compact ? "sm" : "md"}
+              title="View product details"
+              variant="outline"
+            >
+              <Eye className="h-4 w-4" />
+              <span className={cn(compact && "sr-only sm:not-sr-only")}>Details</span>
+            </Button>
+          </div>
+        )}
         {!compact ? (
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-surface-muted">
             Supplied by {brand.name}

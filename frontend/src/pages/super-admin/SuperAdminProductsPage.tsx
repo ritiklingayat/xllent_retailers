@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input, Textarea } from "@/components/ui/Input";
 import type { Product } from "@/models/product";
 import { formatCurrency } from "@/utils/formatCurrency";
-import type { ProductForm } from "./types";
+import { productCategories, type ProductForm } from "./types";
 
 type SuperAdminProductsPageProps = {
   editingId: string | null;
@@ -88,10 +88,22 @@ export function SuperAdminProductsPage({
                 <Input required placeholder="Product Name" value={form.name} onChange={(event) => onUpdateForm("name", event.target.value)} />
               </ProductField>
               <ProductField label="Category">
-                <Input required placeholder="Category" value={form.category} onChange={(event) => onUpdateForm("category", event.target.value)} />
+                <select
+                  className="h-11 rounded-component border border-surface-border bg-surface-white px-3 text-sm outline-none transition focus:border-gold-primary focus:shadow-focus"
+                  onChange={(event) => onUpdateForm("category", event.target.value)}
+                  value={form.category}
+                >
+                  {productCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                  
+                </select>
+
               </ProductField>
               <ProductField label="MRP">
-                <Input required placeholder="MRP" value={form.brand} onChange={(event) => onUpdateForm("brand", event.target.value)} />
+                <Input required min="0" placeholder="MRP" type="number" value={form.mrp} onChange={(event) => onUpdateForm("mrp", event.target.value)} />
               </ProductField>
               <ProductField label="Admin Price">
                 <Input required min="0" placeholder="Admin Price" type="number" value={form.adminPrice} onChange={(event) => onUpdateForm("adminPrice", event.target.value)} />
@@ -157,6 +169,7 @@ export function SuperAdminProductsPage({
               <h3 className="text-base sm:text-xl">{product.name}</h3>
               <p className="mt-1 text-sm">{product.category} / {product.brand}</p>
               <div className="mt-3 grid gap-1 text-xs font-semibold text-surface-muted sm:text-sm">
+                <span>MRP: {formatCurrency(product.mrp ?? product.price)}</span>
                 <span>Admin: {formatCurrency(product.adminPrice ?? product.price)}</span>
                 <span>Super Stockiest: {formatCurrency(product.superStockiestPrice ?? product.price)}</span>
                 <span>Distributor: {formatCurrency(product.distributorsPrice ?? product.price)}</span>

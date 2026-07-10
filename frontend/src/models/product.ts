@@ -4,6 +4,7 @@ export type Product = {
   slug: string;
   category: string;
   brand: string;
+  mrp?: number;
   price: number;
   adminPrice?: number;
   superStockiestPrice?: number;

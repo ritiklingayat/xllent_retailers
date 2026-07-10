@@ -8,9 +8,10 @@ import { loadManagedProducts, productStoreEventName } from "@/services/localStor
 
 type ProductCatalogProps = {
   navigate: (path: string) => void;
+  viewOnly?: boolean;
 };
 
-export function ProductCatalog({ navigate }: ProductCatalogProps) {
+export function ProductCatalog({ navigate, viewOnly = false }: ProductCatalogProps) {
   const [products, setProducts] = useState<Product[]>(() => loadManagedProducts());
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
@@ -50,8 +51,9 @@ export function ProductCatalog({ navigate }: ProductCatalogProps) {
           <h2 className="mt-2">Premium Retail Products</h2>
         </div>
         <p className="max-w-xl text-sm leading-6">
-          Search by product name, category, or brand and add fast-moving grocery,
-          food, beverage, and home care items to your cart.
+          {viewOnly
+            ? "Search by product name, category, or brand and preview available retail products."
+            : "Search by product name, category, or brand and add fast-moving grocery, food, beverage, and home care items to your cart."}
         </p>
       </div>
 
@@ -79,7 +81,7 @@ export function ProductCatalog({ navigate }: ProductCatalogProps) {
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {filteredProducts.map((product) => (
-          <ProductCard compact key={product.id} navigate={navigate} product={product} />
+          <ProductCard compact key={product.id} navigate={navigate} product={product} viewOnly={viewOnly} />
         ))}
       </div>
 

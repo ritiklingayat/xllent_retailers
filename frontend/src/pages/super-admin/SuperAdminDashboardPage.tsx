@@ -6,7 +6,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 
 type SuperAdminDashboardPageProps = {
   productCount: number;
-  customerCount: number;
+  userCount: number;
   orders: CustomerOrder[];
 };
 
@@ -30,13 +30,13 @@ function MiniChart({ values, color }: { values: number[]; color: string }) {
 
 export function SuperAdminDashboardPage({
   productCount,
-  customerCount,
+  userCount,
   orders
 }: SuperAdminDashboardPageProps) {
   const totalRevenue = orders.reduce((total, order) => total + order.total, 0);
   const stats = [
     { label: "Total Products", value: String(productCount), note: "Managed products" },
-    { label: "Total Customers", value: String(customerCount), note: "Registered customers" },
+    { label: "Total Users", value: String(userCount), note: "Created by Super Admin" },
     { label: "Total Orders", value: String(orders.length), note: "Customer orders" },
     { label: "Revenue", value: formatCurrency(totalRevenue), note: "Order total" }
   ];
