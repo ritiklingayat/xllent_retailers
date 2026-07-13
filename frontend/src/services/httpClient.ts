@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiBaseUrl = import.meta.env.VITE_API_URL?.trim() || "http://localhost:8082";
+const apiBaseUrl = import.meta.env.VITE_API_URL?.trim() || "https://xllent-retailers.onrender.com";
 
 export const httpClient = axios.create({
   baseURL: apiBaseUrl,
