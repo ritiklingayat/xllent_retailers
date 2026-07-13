@@ -60,8 +60,8 @@ const emptyUserForm: UserForm = {
 export function SuperAdminUsersPage({ accounts }: SuperAdminUsersPageProps) {
   const [form, setForm] = useState<UserForm>(emptyUserForm);
 
-  const updateForm = (key: keyof UserForm, value: string) => {
-    setForm((current) => ({ ...current, [key]: value }));
+  const updateForm = <K extends keyof UserForm>(key: K, value: UserForm[K]) => {
+    setForm((current) => ({ ...current, [key]: value } as UserForm));
   };
 
   const resetForm = () => setForm(emptyUserForm);

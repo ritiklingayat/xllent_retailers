@@ -11,6 +11,7 @@ type SuperAdminProductsPageProps = {
   editingId: string | null;
   form: ProductForm;
   products: Product[];
+  categories?: { id: number; categoryName: string }[];
   query: string;
   onDeleteProduct: (productId: string) => void;
   onEditProduct: (product: Product) => void;
@@ -39,6 +40,7 @@ export function SuperAdminProductsPage({
   editingId,
   form,
   products,
+  categories,
   query,
   onDeleteProduct,
   onEditProduct,
@@ -65,7 +67,12 @@ export function SuperAdminProductsPage({
     }
 
     const reader = new FileReader();
-    reader.onload = () => onUpdateForm("imageUrl", String(reader.result ?? ""));
+    reader.onload = () => {
+      onUpdateForm("imageUrl", String(reader.result ?? ""));
+      // also set the File object
+      // @ts-ignore
+      onUpdateForm("imageFile", file);
+    };
     reader.readAsDataURL(file);
   };
 
@@ -93,14 +100,19 @@ export function SuperAdminProductsPage({
                   onChange={(event) => onUpdateForm("category", event.target.value)}
                   value={form.category}
                 >
-                  {productCategories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                  
+                  <option value="">Select category</option>
+                  {categories && categories.length > 0
+                    ? categories.map((cat) => (
+                        <option key={cat.id} value={String(cat.id)}>
+                          {cat.categoryName}
+                        </option>
+                      ))
+                    : productCategories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
                 </select>
-
               </ProductField>
               <ProductField label="MRP">
                 <Input required min="0" placeholder="MRP" type="number" value={form.mrp} onChange={(event) => onUpdateForm("mrp", event.target.value)} />

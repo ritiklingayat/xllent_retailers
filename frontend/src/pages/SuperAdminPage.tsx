@@ -14,19 +14,20 @@ import type { Product } from "@/models/product";
 import {
   accountStoreEventName,
   loadAccounts,
-  loadManagedProducts,
   loadOrders,
   orderStoreEventName,
-  saveManagedProducts,
   updateOrderStatus,
   type Account
 } from "@/services/localStore";
+import { getAllCategories } from "@/services/categoryService";
+import { createProduct, getAllProducts } from "@/services/productService";
 import { cn } from "@/utils/cn";
 import { SuperAdminDashboardPage } from "./super-admin/SuperAdminDashboardPage";
 import { SuperAdminLoginPage } from "./super-admin/SuperAdminLoginPage";
 import { SuperAdminOrdersPage } from "./super-admin/SuperAdminOrdersPage";
 import { SuperAdminProductsPage } from "./super-admin/SuperAdminProductsPage";
 import { SuperAdminUsersPage } from "./super-admin/SuperAdminUsersPage";
+import { SuperAdminCategoriesPage } from "./super-admin/SuperAdminCategoriesPage";
 import {
   emptyProductForm,
   type ProductForm,
@@ -42,6 +43,7 @@ const superAdminModules: SuperAdminModule[] = [
   { label: "Dashboard", icon: LayoutDashboard },
   { label: "Users", icon: UserCheck },
   { label: "Products", icon: Boxes },
+  { label: "Categories", icon: Boxes },
   { label: "Orders", icon: PackageCheck }
 ];
 
@@ -64,7 +66,8 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
   const [activePage, setActivePage] = useState<SuperAdminPageKey>("Dashboard");
   const [query, setQuery] = useState("");
   const [accounts, setAccounts] = useState<Account[]>(() => loadAccounts());
-  const [products, setProducts] = useState<Product[]>(() => loadManagedProducts());
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<{ id: number; categoryName: string }[]>([]);
   const [orders, setOrders] = useState<CustomerOrder[]>(() => loadOrders());
   const [form, setForm] = useState<ProductForm>(emptyProductForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -85,6 +88,54 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
     };
   }, []);
 
+  const loadBackendData = async () => {
+    try {
+      const cats = await getAllCategories();
+      setCategories(cats ?? []);
+    } catch (err) {
+      console.error(err);
+    }
+
+    try {
+      const prods = await getAllProducts();
+      setProducts(
+        prods.map((p: any) => ({
+          id: String(p.id),
+          name: p.productName,
+          slug: p.productName?.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          category: p.category,
+          brand: p.brand,
+          mrp: undefined,
+          price: Number(p.wholesellerPrice ?? 0),
+          adminPrice: Number(p.adminPrice ?? 0),
+          superStockiestPrice: Number(p.superStockistPrice ?? 0),
+          distributorsPrice: Number(p.distributorPrice ?? 0),
+          wholesalerPrice: Number(p.wholesellerPrice ?? 0),
+          stock: 0,
+          shortDescription: p.description?.slice(0, 120) ?? "",
+          description: p.description ?? "",
+          imageUrl: p.imageUrl ?? "",
+          colorClass: "from-gold-secondary/20 to-harvest-cream",
+          highlights: [p.category, "Xllent"].filter(Boolean),
+          bestFor: ["Customer orders"]
+        }))
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    loadBackendData();
+    const onCategoriesUpdated = () => {
+      loadBackendData();
+    };
+    window.addEventListener("categories:updated", onCategoriesUpdated);
+    return () => {
+      window.removeEventListener("categories:updated", onCategoriesUpdated);
+    };
+  }, []);
+
   const handleLogin = (email: string, password: string) => {
     if (email === superAdminCredentials.email && password === superAdminCredentials.password) {
       setIsSuperAdminLoggedIn(true);
@@ -95,14 +146,12 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
     setLoginError("Invalid super admin email or password.");
   };
 
-  const updateForm = (key: keyof ProductForm, value: string) => {
-    setForm((current) => ({ ...current, [key]: value }));
+  const updateForm = <K extends keyof ProductForm>(key: K, value: ProductForm[K]) => {
+    setForm((current) => ({ ...current, [key]: value } as ProductForm));
   };
 
-  const persistProducts = (nextProducts: Product[]) => {
-    setProducts(nextProducts);
-    saveManagedProducts(nextProducts);
-  };
+  // products are persisted on the backend; update local state directly
+  const persistProducts = (nextProducts: Product[]) => setProducts(nextProducts);
 
   const resetForm = () => {
     setForm(emptyProductForm);
@@ -110,61 +159,110 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
   };
 
   const submitProduct = () => {
-    const slug = slugify(form.name);
-    const wholesalerPrice = Number(form.wholesalerPrice || 0);
-    const product: Product = {
-      id: editingId ?? slug,
-      name: form.name,
-      slug,
-      category: form.category,
-      brand: "Xllent",
-      mrp: Number(form.mrp || 0),
-      price: wholesalerPrice,
-      adminPrice: Number(form.adminPrice || 0),
-      superStockiestPrice: Number(form.superStockiestPrice || 0),
-      distributorsPrice: Number(form.distributorsPrice || 0),
-      wholesalerPrice,
-      stock: editingId ? products.find((item) => item.id === editingId)?.stock ?? 0 : 0,
-      shortDescription: form.description.slice(0, 120),
-      description: form.description,
-      imageUrl:
-        form.imageUrl ||
-        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=80",
-      colorClass: "from-gold-secondary/20 to-harvest-cream",
-      highlights: [form.category, "Xllent", "Retail ready"].filter(Boolean),
-      bestFor: ["Customer orders", "Retail shelves", "Wholesale supply"]
-    };
+    (async () => {
+      try {
+        const formData = new FormData();
+        formData.append("productName", form.name);
+        formData.append("description", form.description);
+        formData.append("categoryId", String(form.category));
+        formData.append("brand", "Xllent");
+        formData.append("superAdminPrice", String(form.superStockiestPrice || form.wholesalerPrice || 0));
+        formData.append("adminPrice", String(form.adminPrice || 0));
+        formData.append("superStockistPrice", String(form.superStockiestPrice || 0));
+        formData.append("distributorPrice", String(form.distributorsPrice || 0));
+        formData.append("wholesellerPrice", String(form.wholesalerPrice || 0));
+        if (form.imageFile) {
+          formData.append("image", form.imageFile, form.imageFile.name);
+        }
 
-    persistProducts(
-      editingId
-        ? products.map((item) => (item.id === editingId ? product : item))
-        : [product, ...products]
-    );
-    resetForm();
+        await createProduct(formData);
+        // reload products from backend
+        const prods = await getAllProducts();
+        setProducts(
+          prods.map((p: any) => ({
+            id: String(p.id),
+            name: p.productName,
+            slug: p.productName?.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+            category: p.category,
+            brand: p.brand,
+            mrp: undefined,
+            price: Number(p.wholesellerPrice ?? 0),
+            adminPrice: Number(p.adminPrice ?? 0),
+            superStockiestPrice: Number(p.superStockistPrice ?? 0),
+            distributorsPrice: Number(p.distributorPrice ?? 0),
+            wholesalerPrice: Number(p.wholesellerPrice ?? 0),
+            stock: 0,
+            shortDescription: p.description?.slice(0, 120) ?? "",
+            description: p.description ?? "",
+            imageUrl: p.imageUrl ?? "",
+            colorClass: "from-gold-secondary/20 to-harvest-cream",
+            highlights: [p.category, "Xllent"].filter(Boolean),
+            bestFor: ["Customer orders"]
+          }))
+        );
+
+        resetForm();
+      } catch (err) {
+        console.error(err);
+      }
+    })();
   };
 
   const editProduct = (product: Product) => {
+    const matchingCategory = categories.find((cat) => cat.categoryName === product.category);
     setEditingId(product.id);
     setForm({
       name: product.name,
-      category: product.category,
+      category: matchingCategory ? String(matchingCategory.id) : product.category,
       mrp: String(product.mrp ?? product.price),
       adminPrice: String(product.adminPrice ?? product.price),
       superStockiestPrice: String(product.superStockiestPrice ?? product.price),
       distributorsPrice: String(product.distributorsPrice ?? product.price),
       wholesalerPrice: String(product.wholesalerPrice ?? product.price),
       imageUrl: product.imageUrl,
-      description: product.description
+      description: product.description,
+      imageFile: null
     });
     setActivePage("Products");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const deleteProduct = (productId: string) => {
-    persistProducts(products.filter((product) => product.id !== productId));
-    if (editingId === productId) {
-      resetForm();
-    }
+    (async () => {
+      try {
+        // backend expects numeric id
+        await (await import("@/services/productService")).deleteProduct(Number(productId));
+        const prods = await getAllProducts();
+        setProducts(
+          prods.map((p: any) => ({
+            id: String(p.id),
+            name: p.productName,
+            slug: p.productName?.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+            category: p.category,
+            brand: p.brand,
+            mrp: undefined,
+            price: Number(p.wholesellerPrice ?? 0),
+            adminPrice: Number(p.adminPrice ?? 0),
+            superStockiestPrice: Number(p.superStockistPrice ?? 0),
+            distributorsPrice: Number(p.distributorPrice ?? 0),
+            wholesalerPrice: Number(p.wholesellerPrice ?? 0),
+            stock: 0,
+            shortDescription: p.description?.slice(0, 120) ?? "",
+            description: p.description ?? "",
+            imageUrl: p.imageUrl ?? "",
+            colorClass: "from-gold-secondary/20 to-harvest-cream",
+            highlights: [p.category, "Xllent"].filter(Boolean),
+            bestFor: ["Customer orders"]
+          }))
+        );
+
+        if (editingId === productId) {
+          resetForm();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    })();
   };
 
   const handleStatusChange = (orderId: string, status: OrderStatus) => {
@@ -238,8 +336,11 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
 
           {activePage === "Users" ? <SuperAdminUsersPage accounts={accounts} /> : null}
 
+          {activePage === "Categories" ? <SuperAdminCategoriesPage /> : null}
+
           {activePage === "Products" ? (
             <SuperAdminProductsPage
+              categories={categories}
               editingId={editingId}
               form={form}
               onDeleteProduct={deleteProduct}
