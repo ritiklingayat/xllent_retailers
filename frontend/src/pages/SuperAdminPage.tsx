@@ -72,6 +72,7 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
   const [form, setForm] = useState<ProductForm>(emptyProductForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+  const [productMessage, setProductMessage] = useState<string>("");
 
   useEffect(() => {
     const refreshAccounts = () => setAccounts(loadAccounts());
@@ -156,6 +157,7 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
   const resetForm = () => {
     setForm(emptyProductForm);
     setEditingId(null);
+    setProductMessage("");
   };
 
   const submitProduct = () => {
@@ -201,9 +203,11 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
           }))
         );
 
+        setProductMessage("Product added successfully.");
         resetForm();
       } catch (err) {
         console.error(err);
+        setProductMessage("Unable to add product. Please try again.");
       }
     })();
   };
@@ -211,6 +215,7 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
   const editProduct = (product: Product) => {
     const matchingCategory = categories.find((cat) => cat.categoryName === product.category);
     setEditingId(product.id);
+    setProductMessage("");
     setForm({
       name: product.name,
       category: matchingCategory ? String(matchingCategory.id) : product.category,
@@ -345,6 +350,7 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
               form={form}
               onDeleteProduct={deleteProduct}
               onEditProduct={editProduct}
+              message={productMessage}
               onQueryChange={setQuery}
               onResetForm={resetForm}
               onSubmitProduct={submitProduct}

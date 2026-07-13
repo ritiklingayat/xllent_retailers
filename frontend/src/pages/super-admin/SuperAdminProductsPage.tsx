@@ -19,6 +19,7 @@ type SuperAdminProductsPageProps = {
   onResetForm: () => void;
   onSubmitProduct: () => void;
   onUpdateForm: (key: keyof ProductForm, value: string) => void;
+  message?: string;
 };
 
 function ProductField({
@@ -47,7 +48,8 @@ export function SuperAdminProductsPage({
   onQueryChange,
   onResetForm,
   onSubmitProduct,
-  onUpdateForm
+  onUpdateForm,
+  message
 }: SuperAdminProductsPageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const filteredProducts = useMemo(
@@ -162,6 +164,11 @@ export function SuperAdminProductsPage({
                 </Button>
               ) : null}
             </div>
+            {message ? (
+              <div className="rounded-component border border-gold-primary/30 bg-gold-pale px-3 py-2 text-sm font-semibold text-gold-dark">
+                {message}
+              </div>
+            ) : null}
           </form>
         </CardContent>
       </Card>
