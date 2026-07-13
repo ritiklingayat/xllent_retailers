@@ -14,11 +14,11 @@ public class CorsConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 🔒 Explicitly allow your Vercel frontend and local testing environment
-        configuration.setAllowedOrigins(
+      configuration.setAllowedOrigins(
                 List.of(
-                    "https://xllent-retailers.vercel.app", 
-                    "http://localhost:5173" // Good to keep for local Vite testing
+                    "https://xllent-retailers-ten.vercel.app",
+                    "https://xllent-retailers-ihpbxd4j5-sw-multimedia-team.vercel.app",
+                    "http://localhost:5173"
                 )
         );
 
