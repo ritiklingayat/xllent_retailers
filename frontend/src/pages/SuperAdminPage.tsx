@@ -20,7 +20,11 @@ import {
   type Account
 } from "@/services/localStore";
 import { getAllCategories } from "@/services/categoryService";
-import { createProduct, getAllProducts } from "@/services/productService";
+import {
+  createProduct,
+  deleteProduct as deleteProductRequest,
+  getAllProducts
+} from "@/services/productService";
 import { cn } from "@/utils/cn";
 import { SuperAdminDashboardPage } from "./super-admin/SuperAdminDashboardPage";
 import { SuperAdminLoginPage } from "./super-admin/SuperAdminLoginPage";
@@ -236,7 +240,7 @@ export function SuperAdminPage({ navigate }: SuperAdminPageProps) {
     (async () => {
       try {
         // backend expects numeric id
-        await (await import("@/services/productService")).deleteProduct(Number(productId));
+        await deleteProductRequest(Number(productId));
         const prods = await getAllProducts();
         setProducts(
           prods.map((p: any) => ({

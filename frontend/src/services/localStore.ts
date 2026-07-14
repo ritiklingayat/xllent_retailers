@@ -2,27 +2,8 @@ import type { Product } from "@/models/product";
 import type { CustomerDetails, CustomerOrder, OrderStatus } from "@/models/order";
 import { products as defaultProducts } from "@/models/products";
 
-export type Account = {
-  id: string;
-  userId: string;
-  name: string;
-  brand: string;
-  profileImage: string;
-  status: UserStatus;
-  phone: string;
-  email: string;
-  password: string;
-  role: UserRole;
-  state: string;
-  district: string;
-  city: string;
-  address: string;
-  pincode: string;
-  gstin: string;
-  parentUserId: string;
-  createdAt: string;
-  updatedAt?: string;
-};
+export type Account = { id: string; userId: string; name: string; brand: string; profileImage: string; status: UserStatus; phone: string; email: string; password: string; role: UserRole; state: string; district: string; city: string; address: string; pincode: string; gstin: string; parentUserId: string; createdAt: string; updatedAt?: string; };
+
 
 export type UserRole = "Admin" | "Super Stockist" | "Distributor" | "Wholesaler" | "Customer";
 export type UserStatus = "Active" | "Inactive";
