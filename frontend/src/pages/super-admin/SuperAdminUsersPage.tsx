@@ -16,15 +16,35 @@ type SuperAdminUsersPageProps = {
 };
 
 type UserForm = {
-  id: string | null;
-  name: string;
-  userId: string;
-  password: string;
-  role: UserRole;
-  brand: string;
-  status: UserStatus;
-  phone: string;
-  email: string;
+    id: string | null;
+
+    photo: File | null;
+
+    fullName: string;
+
+    mobile: string;
+
+    email: string;
+
+    password: string;
+
+    role: UserRole;
+
+    state: string;
+
+    district: string;
+
+    city: string;
+
+    address: string;
+
+    pinCode: string;
+
+    gst: string;
+
+    parentUser: string;
+
+    status: UserStatus;
 };
 
 const roleOptions: UserRole[] = [
@@ -47,14 +67,34 @@ const authorityByRole: Record<UserRole, string> = {
 
 const emptyUserForm: UserForm = {
   id: null,
-  name: "",
-  userId: "",
+
+  photo: null,
+
+  fullName: "",
+
+  mobile: "",
+
+  email: "",
+
   password: "",
-  role: "Customer",
-  brand: "",
-  status: "Active",
-  phone: "",
-  email: ""
+
+  role: "Customer", // Change if your backend uses different role values
+
+  state: "",
+
+  district: "",
+
+  city: "",
+
+  address: "",
+
+  pinCode: "",
+
+  gst: "",
+
+  parentUser: "",
+
+  status: "Active" // Change if backend expects "ACTIVE"
 };
 
 export function SuperAdminUsersPage({ accounts }: SuperAdminUsersPageProps) {
@@ -67,19 +107,26 @@ export function SuperAdminUsersPage({ accounts }: SuperAdminUsersPageProps) {
   const resetForm = () => setForm(emptyUserForm);
 
   const editAccount = (account: Account) => {
-    setForm({
-      id: account.id,
-      name: account.name,
-      userId: account.userId,
-      password: account.password,
-      role: account.role,
-      brand: account.brand,
-      status: account.status,
-      phone: account.phone,
-      email: account.email
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  setForm({
+  id: account.id,
+  photo: null,
+  fullName: account.name,
+  mobile: account.phone,
+  email: account.email,
+  password: account.password,
+  role: account.role,
+  state: "",
+  district: "",
+  city: "",
+  address: "",
+  pinCode: "",
+  gst: "",
+  parentUser: "",
+  status: account.status
+});
+
+window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
   return (
     <div className="space-y-5">
@@ -98,67 +145,167 @@ export function SuperAdminUsersPage({ accounts }: SuperAdminUsersPageProps) {
               if (form.id) {
                 deleteAccount(form.id);
               }
-              saveAccount({
-                name: form.name,
-                userId: form.userId,
-                password: form.password,
-                role: form.role,
-                brand: form.brand,
-                status: form.status,
-                phone: form.phone,
-                email: form.email,
-                updatedAt: form.id ? new Date().toISOString() : undefined
-              });
+
+  saveAccount({
+  name: form.fullName,
+  userId: form.email,
+  password: form.password,
+  role: form.role,
+  brand: form.gst,
+  status: form.status,
+  phone: form.mobile,
+  email: form.email,
+  updatedAt: form.id ? new Date().toISOString() : undefined
+});
+
               resetForm();
             }}
           >
-            <div className="grid gap-3 md:grid-cols-2">
-              <Input required placeholder="Name" value={form.name} onChange={(event) => updateForm("name", event.target.value)} />
-              <Input required placeholder="User ID" value={form.userId} onChange={(event) => updateForm("userId", event.target.value)} />
-              <Input required placeholder="Password" value={form.password} onChange={(event) => updateForm("password", event.target.value)} />
-              <select
-                className="h-11 rounded-component border border-surface-border bg-surface-white px-3 text-sm outline-none transition focus:border-gold-primary focus:shadow-focus"
-                onChange={(event) => updateForm("role", event.target.value as UserRole)}
-                value={form.role}
-              >
-                {roleOptions.map((role) => (
-                  <option key={role} value={role}>
-                    {role}
-                  </option>
-                ))}
-              </select>
-              <Input placeholder="Brand" value={form.brand} onChange={(event) => updateForm("brand", event.target.value)} />
-              <select
-                className="h-11 rounded-component border border-surface-border bg-surface-white px-3 text-sm outline-none transition focus:border-gold-primary focus:shadow-focus"
-                onChange={(event) => updateForm("status", event.target.value as UserStatus)}
-                value={form.status}
-              >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-              <Input placeholder="Phone number" type="tel" value={form.phone} onChange={(event) => updateForm("phone", event.target.value)} />
-              <Input placeholder="Email ID" type="email" value={form.email} onChange={(event) => updateForm("email", event.target.value)} />
-            </div>
-            <div className="rounded-component border border-gold-primary/30 bg-gold-pale px-3 py-2 text-sm font-semibold text-gold-dark">
-              Authority: {authorityByRole[form.role]}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button className="gap-2" type="submit">
-                {form.id ? <Edit3 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                {form.id ? "Update User" : "Create User"}
-              </Button>
-              {form.id ? (
-                <Button onClick={resetForm} type="button" variant="ghost">
-                  Cancel Edit
-                </Button>
-              ) : null}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+           <div className="grid gap-3 md:grid-cols-2">
+  {/* Photo */}
+  <div className="md:col-span-2">
+    <label className="mb-1 block text-sm font-medium">Photo</label>
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(event) =>
+        updateForm("photo", event.target.files?.[0] ?? null)
+      }
+      className="w-full rounded-component border border-surface-border p-2"
+    />
+  </div>
+
+  {/* Full Name */}
+  <Input
+    required
+    placeholder="Full Name"
+    value={form.fullName}
+    onChange={(event) => updateForm("fullName", event.target.value)}
+  />
+
+  {/* Mobile */}
+  <Input
+    required
+    placeholder="Mobile"
+    type="tel"
+    value={form.mobile}
+    onChange={(event) => updateForm("mobile", event.target.value)}
+  />
+
+  {/* Email */}
+  <Input
+    required
+    placeholder="Email"
+    type="email"
+    value={form.email}
+    onChange={(event) => updateForm("email", event.target.value)}
+  />
+
+  {/* Password */}
+  <Input
+    required
+    placeholder="Password"
+    type="password"
+    value={form.password}
+    onChange={(event) => updateForm("password", event.target.value)}
+  />
+
+  {/* Role */}
+  <select
+    className="h-11 rounded-component border border-surface-border bg-surface-white px-3 text-sm outline-none transition focus:border-gold-primary focus:shadow-focus"
+    value={form.role}
+    onChange={(event) =>
+      updateForm("role", event.target.value as UserRole)
+    }
+  >
+    {roleOptions.map((role) => (
+      <option key={role} value={role}>
+        {role}
+      </option>
+    ))}
+  </select>
+
+  {/* Parent User */}
+  <Input
+    placeholder="Parent User"
+    value={form.parentUser}
+    onChange={(event) => updateForm("parentUser", event.target.value)}
+  />
+
+  {/* State */}
+  <Input
+    placeholder="State"
+    value={form.state}
+    onChange={(event) => updateForm("state", event.target.value)}
+  />
+
+  {/* District */}
+  <Input
+    placeholder="District"
+    value={form.district}
+    onChange={(event) => updateForm("district", event.target.value)}
+  />
+
+  {/* City */}
+  <Input
+    placeholder="City"
+    value={form.city}
+    onChange={(event) => updateForm("city", event.target.value)}
+  />
+
+  {/* Address */}
+  <textarea
+    className="rounded-component border border-surface-border p-3 md:col-span-2"
+    rows={3}
+    placeholder="Address"
+    value={form.address}
+    onChange={(event) => updateForm("address", event.target.value)}
+  />
+
+  {/* Pin Code */}
+  <Input
+    placeholder="Pin Code"
+    value={form.pinCode}
+    onChange={(event) => updateForm("pinCode", event.target.value)}
+  />
+
+  {/* GST */}
+  <Input
+    placeholder="GST"
+    value={form.gst}
+    onChange={(event) => updateForm("gst", event.target.value)}
+  />
+
+  {/* Status */}
+  <select
+    className="h-11 rounded-component border border-surface-border bg-surface-white px-3 text-sm outline-none transition focus:border-gold-primary focus:shadow-focus"
+    value={form.status}
+    onChange={(event) =>
+      updateForm("status", event.target.value as UserStatus)
+    }
+  >
+    {statusOptions.map((status) => (
+      <option key={status} value={status}>
+        {status}
+      </option>
+    ))}
+  </select>
+</div>
+
+<div className="rounded-component border border-gold-primary/30 bg-gold-pale px-3 py-2 text-sm font-semibold text-gold-dark">
+  Authority: {authorityByRole[form.role]}
+</div>
+
+<div className="flex flex-wrap gap-2">
+  <Button className="gap-2" type="submit">
+    {form.id ? <Edit3 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+    Save
+  </Button>
+
+  <Button onClick={resetForm} type="button" variant="ghost">
+    Cancel
+  </Button>
+</div>
 
       <Card>
         <CardHeader>

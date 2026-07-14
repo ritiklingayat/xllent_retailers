@@ -7,11 +7,19 @@ export type Account = {
   userId: string;
   name: string;
   brand: string;
+  profileImage: string;
   status: UserStatus;
   phone: string;
   email: string;
   password: string;
   role: UserRole;
+  state: string;
+  district: string;
+  city: string;
+  address: string;
+  pincode: string;
+  gstin: string;
+  parentUserId: string;
   createdAt: string;
   updatedAt?: string;
 };
@@ -45,11 +53,19 @@ export function loadAccounts() {
     userId: account.userId ?? account.email ?? account.phone ?? "",
     name: account.name ?? "",
     brand: account.brand ?? "",
+    profileImage: account.profileImage ?? "",
     status: account.status ?? "Active",
     phone: account.phone ?? "",
     email: account.email ?? "",
     password: account.password ?? "",
     role: account.role ?? "Customer",
+    state: account.state ?? "",
+    district: account.district ?? "",
+    city: account.city ?? "",
+    address: account.address ?? "",
+    pincode: account.pincode ?? "",
+    gstin: account.gstin ?? "",
+    parentUserId: account.parentUserId ?? "",
     createdAt: account.createdAt ?? new Date().toISOString(),
     updatedAt: account.updatedAt
   }));
